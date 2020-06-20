@@ -1,0 +1,56 @@
+/**
+ * Custom theme for reveal.js.
+ *
+ * By Gerasimos Chourdakis
+ * Based on White by Hakim El Hattab, http://hakim.se
+ */
+
+
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+// Include theme-specific fonts
+@import url(../../lib/font/source-sans-pro/source-sans-pro.css);
+
+
+// Override theme settings (see ../template/settings.scss)
+$backgroundColor: #fff;
+
+$mainColor: #000;
+$headingColor: #000;
+
+$mainFontSize: 36px;
+$mainFont: 'Source Sans Pro', Helvetica, sans-serif;
+$headingFont: 'Source Sans Pro', Helvetica, sans-serif;
+$headingTextShadow: none;
+$headingLetterSpacing: normal;
+$headingTextTransform: normal;
+$headingFontWeight: 600;
+$linkColor: #0065BD;
+$linkColorHover: lighten( $linkColor, 15% );
+$selectionBackgroundColor: lighten( $linkColor, 25% );
+
+$heading1Size: 1.6em;
+$heading2Size: 1.3em;
+$heading3Size: 1.0em;
+$heading4Size: 1.0em;
+
+section.has-dark-background {
+	&, h1, h2, h3, h4, h5, h6 {
+		color: #fff;
+	}
+}
+
+// body:after {
+// 	content: url(../../images/precice.png);
+// 	position: fixed;
+// 	top: 2.5em;
+// 	right: 2.5em;
+// }
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------

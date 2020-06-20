@@ -1,0 +1,548 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>Multiphysics Modeling with the preCICE Coupling Library</title>
+
+        <link rel="stylesheet" href="dist/reset.css">
+        <link rel="stylesheet" href="dist/reveal.css">
+        <link rel="stylesheet" href="dist/theme/precice.css" id="theme">
+
+        <!-- Theme used for syntax highlighted code -->
+        <link rel="stylesheet" href="plugin/highlight/atom-one-light.css" id="highlight-theme">
+
+        <style>
+        .container{
+            display: flex;
+        }
+        .col{
+            flex: 1;
+        }
+        </style>
+
+        <!-- FontAwesome -->
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+        <style> .reveal i.fa { font-family:FontAwesome; font-style: normal; } </style>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+        
+                <!-- Title slide -->
+                <section>
+                    <small>15th OpenFOAM Workshop - June 24, 2020 - Training III-E</small>
+                    <h1>Multiphysics Modeling with the preCICE Coupling Library</h1>
+                    <div style="margin-top:50pt">
+                        <div>
+                            <small>Gerasimos Chourdakis, Technical University of Munich<br/><a href="mailto:chourdak@in.tum.de">chourdak@in.tum.de</a></small><br/>
+                            <img data-src="images/logos/tum.png" style="border:none; box-shadow:none; height:30px;">
+                        </div>
+                        <div style="margin-top:20pt">
+                            <small>Benjamin Uekermann, Eindhoven University of Technology<br/><a href="mailto:b.w.uekermann@tue.nl">b.w.uekermann@tue.nl</a></small><br/>
+                            <img data-src="images/logos/tue.png" style="border:none; box-shadow:none; height:30px;">
+                        </div>
+                    </div>
+                </section>
+                
+                <section data-markdown="sections/intro.md" data-separator-vertical="vvv"></section>
+                
+                <!-- Level 1: General -->
+                <section data-markdown data-separator-vertical="vvv">
+                    <textarea data-template>
+                        # Level 1: Coupling two simple solvers
+
+                        ---
+
+                        ## "Generator" and "Propagator"
+
+                        <div class="container" style="margin-top:50pt">
+
+                        <div class="col">
+
+                        - `generator.py`: generates random data in a 1D domain
+                        - `propagator.py`: propagates boundary data over a 2D domain
+                        </div>
+
+                        <div class="col">
+                        <img data-src="images/level1/propagator_description.png" style="border:none; box-shadow:none; max-width:100%;">
+                        </div>
+
+                        </div>
+
+                        ---
+
+                        ## Serial-Explicit, Unidirectional Coupling
+
+                        <img data-src="images/level1/serial-explicit.svg" style="border:none; box-shadow:none; max-width:80%;">
+                        
+                        ---
+
+                        ## generator.py
+
+                        ```python
+                        import numpy
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        dt = 0.01
+                        t = 0
+
+                        while True:
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          t = t + dt 
+                          if(t > 0.1):
+                            break
+                        ```
+
+                        vvv
+
+                        ## propagator.py
+
+                        ```python
+                        # generate mesh
+                        n = 20
+                        x = numpy.linspace(0, 1, n+1)
+                        y = numpy.linspace(0, 1, n+1)
+
+                        # initial data, associated to cell centers
+                        u = numpy.zeros([n, n])
+
+                        dt = 0.01
+                        t = 0
+
+                        # some data to propagate, "-1" in Python means the last entry
+                        u[:,-1] = y[:-1] 
+
+                        while True:
+                          
+                          print("Propagating data")
+                          # some (arbitrary) convection-diffusion rule
+                          # top row
+                          u[0, :-1] = 0.3 * u[0, :-1] + 0.6 * u[0, 1:] + 0.1 * u[1, :-1] 
+                          # inner domain
+                          u[1:-1, :-1] = 0.2 * u[1:-1, :-1] + 0.6 * u[1:-1, 1:] + 0.1 * u[2:, :-1] + 0.1 * u[:-2, :-1]
+                          # bottom row
+                          u[-1, :-1] = 0.3 * u[-1, :-1] + 0.6 * u[-1, 1:] + 0.1 * u[-1, :-1]
+
+                          t = t + dt 
+                          if(t > 0.2):
+                            break
+                        ```
+
+                        ---
+
+                        ## Dependencies
+
+                        - [preCICE](https://www.precice.org/) v2
+                        - Python 3
+                        - Python packages `numpy`, `matplotlib`
+                        - [preCICE Python bindings](https://github.com/precice/python-bindings)
+                    </textarea>
+                </section>
+                
+                <!--- Level 1: Code step-by-step -->
+                <!-- Base -->
+                <section data-auto-animate>
+                    <h2>Import preCICE</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers>
+                        import numpy
+                        
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        dt = 0.01
+                        t = 0
+
+                        while True:
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          t = t + dt 
+                          if(t > 0.1):
+                            break
+                    </code></pre>
+                </section>
+                <!-- Import preCICE -->
+                <section data-auto-animate>
+                    <h2>Import preCICE</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="2">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        dt = 0.01
+                        t = 0
+
+                        while True:
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          t = t + dt 
+                          if(t > 0.1):
+                            break
+                    </code></pre>
+                </section>
+                <!-- Configure preCICE -->
+                <section data-auto-animate>
+                    <h2>Configure preCICE</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="2|8-19">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+
+                        dt = 0.01
+                        t = 0
+
+                        while True:
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          t = t + dt 
+                          if(t > 0.1):
+                            break
+                    </code></pre>
+                </section>
+                <!-- Set the preCICE mesh vertices -->
+                <section data-auto-animate>
+                    <h2>Set the preCICE mesh vertices</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="8-19|21-25">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+                        
+                        # preCICE mesh setup
+                        mesh_name  = "Generator-Mesh"
+                        mesh_id    = interface.get_mesh_id(mesh_name)
+                        vertices   = [[1, y0] for y0 in y[:-1]]
+                        vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+                        
+                        dt = 0.01
+                        t = 0
+
+                        while True:
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          t = t + dt 
+                          if(t > 0.1):
+                            break
+                    </code></pre>
+                </section>
+                <!-- Initialize and finalize preCICE -->
+                <section data-auto-animate>
+                    <h2>Initialize and finalize preCICE</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="21-25|27,40">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+                        
+                        # preCICE mesh setup
+                        mesh_name  = "Generator-Mesh"
+                        mesh_id    = interface.get_mesh_id(mesh_name)
+                        vertices   = [[1, y0] for y0 in y[:-1]]
+                        vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+                        
+                        interface.initialize()
+
+                        dt = 0.01
+                        t = 0
+
+                        while True:
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          t = t + dt 
+                          if(t > 0.1):
+                            break
+                        
+                        interface.finalize()
+                    </code></pre>
+                </section>
+                <!-- Advance the coupling: focus -->
+                <section data-auto-animate>
+                    <h2>Advance the coupling</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="27,42|32-40">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+                        
+                        # preCICE mesh setup
+                         mesh_name  = "Generator-Mesh"
+                         mesh_id    = interface.get_mesh_id(mesh_name)
+                         vertices   = [[1, y0] for y0 in y[:-1]]
+                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+                        
+                        interface.initialize()
+
+                        dt = 0.01
+                        t = 0
+
+                        while True:
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          
+                          
+                          t = t + dt 
+                          if(t > 0.1):
+                            break
+                        
+                        interface.finalize()
+                    </code></pre>
+                </section>
+                <!-- Advance the coupling: call -->
+                <section data-auto-animate>
+                    <h2>Advance the coupling</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="32-40">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+                        
+                        # preCICE mesh setup
+                         mesh_name  = "Generator-Mesh"
+                         mesh_id    = interface.get_mesh_id(mesh_name)
+                         vertices   = [[1, y0] for y0 in y[:-1]]
+                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+                        
+                        interface.initialize()
+
+                        dt = 0.01
+                        t = 0
+
+                        while True:
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          interface.advance(dt)
+                          
+                          t = t + dt 
+                          if(t > 0.1):
+                            break
+                        
+                        interface.finalize()
+                    </code></pre>
+                </section>
+                <!-- Advance the coupling: time -->
+                <section data-auto-animate>
+                    <h2>Advance the coupling</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="32-40">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+                        
+                        # preCICE mesh setup
+                         mesh_name  = "Generator-Mesh"
+                         mesh_id    = interface.get_mesh_id(mesh_name)
+                         vertices   = [[1, y0] for y0 in y[:-1]]
+                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+                        
+                        interface.initialize()
+
+                        dt = 0.01
+                        t = 0
+
+                        while interface.is_coupling_ongoing():
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          precice_dt = interface.advance(dt)
+                          
+                          t = t + dt 
+                        
+                        
+                        
+                        interface.finalize()
+                    </code></pre>
+                </section>
+                <!-- Advance the coupling: time 2-->
+                <section data-auto-animate>
+                    <h2>Advance the coupling</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="32-40|27,32-40">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+                        
+                        # preCICE mesh setup
+                         mesh_name  = "Generator-Mesh"
+                         mesh_id    = interface.get_mesh_id(mesh_name)
+                         vertices   = [[1, y0] for y0 in y[:-1]]
+                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+                        
+                        precice_dt = interface.initialize()
+
+                        dt = 0.01
+                        t = 0
+
+                        while interface.is_coupling_ongoing():
+                          dt = np.minimum(dt, precice_dt)
+                          
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          precice_dt = interface.advance(dt)
+                          
+                          t = t + dt 
+                        
+                        interface.finalize()
+                    </code></pre>
+                </section>
+                <section>Not there yet, but let's run it<br/><small>(similar changes in <tt>propagator.py</tt> - try it at home)</small></section>
+                <section><script id="asciicast-UwMVk0tbq8cOCdTd5dEpNh7F3" src="https://asciinema.org/a/UwMVk0tbq8cOCdTd5dEpNh7F3.js" data-autoplay="true" data-size="medium"></script></section>
+                <section><video data-autoplay src="videos/propagator_constant.webm"></video></section>
+                <section data-markdown="sections/level2.md" data-separator-vertical="vvv"></section>
+                <section data-markdown="sections/level3.md" data-separator-vertical="vvv"></section>
+                <section data-markdown="sections/resources.md" data-separator-vertical="vvv"></section>
+                <section data-markdown="sections/closing.md" data-separator-vertical="vvv"></section>
+            </div>
+        </div>
+
+        <script src="dist/reveal.js"></script>
+        <script src="plugin/notes/notes.js"></script>
+        <script src="plugin/markdown/markdown.js"></script>
+        <script src="plugin/highlight/highlight.js"></script>
+        <script>
+            // More info about initialization & config:
+            // - https://revealjs.com/initialization/
+            // - https://revealjs.com/config/
+            Reveal.initialize({
+                width: 960,
+                height: 700,
+                center: true,
+                controls: true,
+                controlsTutorial: false,
+                progress: true,
+                slideNumber: false,
+                center: true,
+                hash: true,
+                transition: 'none', // none/fade/slide/convex/concave/zoom
+                backgroundTransition: 'none', // none/fade/slide/convex/concave/zoom
+                defaultTiming: 50,
+                // Learn about plugins: https://revealjs.com/plugins/
+                plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+            });
+        </script>
+    </body>
+</html>
