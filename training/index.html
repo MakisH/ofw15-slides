@@ -509,12 +509,199 @@
                         interface.finalize()
                     </code></pre>
                 </section>
+                <!-- Run and results -->
                 <section>Not there yet, but let's run it<br/><small>(similar changes in <tt>propagator.py</tt> - try it at home)</small></section>
                 <section><script id="asciicast-UwMVk0tbq8cOCdTd5dEpNh7F3" src="https://asciinema.org/a/UwMVk0tbq8cOCdTd5dEpNh7F3.js" data-autoplay="true" data-size="medium"></script></section>
-                <section><video data-autoplay src="videos/propagator_constant.webm"></video></section>
+                <section>
+                    <h2>Nothing happening?</h2>
+                    <p><video data-autoplay src="videos/propagator_constant.webm"></video></p>
+                    <small>Did we forget something?</small>
+                </section>
+                <!-- Write & read data: focus -->
+                <section data-auto-animate>
+                    <h2>Write & read data</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="40,47">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+                        
+
+
+
+
+
+
+
+                        
+                        # preCICE mesh setup
+                         mesh_name  = "Generator-Mesh"
+                         mesh_id    = interface.get_mesh_id(mesh_name)
+                         vertices   = [[1, y0] for y0 in y[:-1]]
+                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+                        
+                        precice_dt = interface.initialize()
+
+                        dt = 0.01
+                        t = 0
+
+                        while interface.is_coupling_ongoing():
+                          dt = np.minimum(dt, precice_dt)
+                          
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+
+                          precice_dt = interface.advance(dt)
+
+                          
+                          t = t + dt 
+                        
+                        interface.finalize()
+                    </code></pre>
+                </section>
+                <!-- Write & read data: implement -->
+                <section data-auto-animate>
+                    <h2>Write & read data</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="40, 47|46,48|21-23|21-27,46-48">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+                        
+                        # Get the preCICE mesh id
+                        mesh_name = "Generator-Mesh"
+                        mesh_id = interface.get_mesh_id(mesh_name)
+
+                        # Get the exchanged data id
+                        data_name = "Data"
+                        data_id = interface.get_data_id(data_name, mesh_id)
+                        
+                        # preCICE mesh setup
+                         mesh_name  = "Generator-Mesh"
+                         mesh_id    = interface.get_mesh_id(mesh_name)
+                         vertices   = [[1, y0] for y0 in y[:-1]]
+                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+                        
+                        precice_dt = interface.initialize()
+
+                        dt = 0.01
+                        t = 0
+
+                        while interface.is_coupling_ongoing():
+                          dt = np.minimum(dt, precice_dt)
+                          
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          interface.write_block_scalar_data(data_id, vertex_ids, u)
+                          precice_dt = interface.advance(dt)
+                          # interface.read_block_scalar_data(data_id, vertex_ids, u)
+                          
+                          t = t + dt 
+                        
+                        interface.finalize()
+                    </code></pre>
+                </section>
+                <!-- preCICE config -->
+                <section>
+                    <h2>preCICE configuration file</h2>
+                    <section>
+                    <small>Visual representation of precice-config.xml using the <a href="https://github.com/precice/config-visualizer" title="preCICE config visualizer">config visualizer</a>:</small>
+                    <img src="images/level1/config-original.png" alt="Visual representation of the precice-config.xml"/>
+                    </section>
+                    <section>
+                    <small><tt>precice-config.xml</tt>:</small>
+                    <pre><code class="language-xml" data-trim data-line-numbers="3|5|7-13|15-18|20-25|27|29-34">
+                        <script type="text/template">
+                        <precice-configuration>
+                          <solver-interface dimensions="2">
+
+                          <data:scalar name="Data"/>
+
+                          <mesh name="Generator-Mesh">
+                            <use-data name="Data"/>
+                          </mesh>
+
+                          <mesh name="Propagator-Mesh">
+                            <use-data name="Data" />
+                          </mesh>
+                          
+                          <participant name="Generator">
+                            <use-mesh name="Generator-Mesh" provide="yes"/>
+                            <write-data name="Data" mesh="Generator-Mesh"/>
+                          </participant>
+
+                          <participant name="Propagator">
+                            <use-mesh name="Generator-Mesh" from="Generator"/>
+                            <use-mesh name="Propagator-Mesh" provide="yes"/>
+                            <mapping:nearest-neighbor direction="read"  from="Generator-Mesh" to="Propagator-Mesh" constraint="consistent"/>
+                            <read-data name="Data" mesh="Propagator-Mesh" />
+                          </participant>    
+
+                          <m2n:sockets from="Generator" to="Propagator"/>
+
+                          <coupling-scheme:serial-explicit>
+                            <participants first="Generator" second="Propagator"/>
+                            <time-window-size value="0.01"/>
+                            <max-time value="0.1"/>
+                            <exchange data="Data" mesh="Generator-Mesh" from="Generator" to="Propagator"/>
+                          </coupling-scheme:serial-explicit>
+                          
+                          </solver-interface>
+                        </precice-configuration>
+                    </script></code></pre>
+                </section>
+                </section>
+                <!-- Run and results, part 2 -->
+                <section>It should work now!</small></section>
+                <section><script <script id="asciicast-IwmCtbNoGxqgsrNEiA7mONPmv" src="https://asciinema.org/a/IwmCtbNoGxqgsrNEiA7mONPmv.js" async></script> data-autoplay="true" data-size="medium"></script></section>
+                <section>
+                    <h2>Data is being transfered!</h2>
+                    <p><video data-autoplay src="videos/propagator_coupled.webm"></video></p>
+                    <small>Most basic case: uni-directional, serial-explicit, nearest-neighbor mapping, ...</small>
+                </section>
+                
+                <!-- Level 2: OpenFOAM + OpenFOAM -->
                 <section data-markdown="sections/level2.md" data-separator-vertical="vvv"></section>
+                
+                <!-- Level 3: OpenFOAM + deal.ii -->
                 <section data-markdown="sections/level3.md" data-separator-vertical="vvv"></section>
+                
+                <!-- Resources -->
                 <section data-markdown="sections/resources.md" data-separator-vertical="vvv"></section>
+                
+                <!-- Closing -->
                 <section data-markdown="sections/closing.md" data-separator-vertical="vvv"></section>
             </div>
         </div>
