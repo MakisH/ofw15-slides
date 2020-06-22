@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>A flexible and preCICE solver coupling ecosystem</title>
+
+        <link rel="stylesheet" href="dist/reset.css">
+        <link rel="stylesheet" href="dist/reveal.css">
+        <link rel="stylesheet" href="dist/theme/precice.css" id="theme">
+
+        <!-- Theme used for syntax highlighted code -->
+        <link rel="stylesheet" href="plugin/highlight/atom-one-light.css" id="highlight-theme">
+
+        <style>
+        .container{
+            display: flex;
+        }
+        .col{
+            flex: 1;
+        }
+        </style>
+
+        <!-- FontAwesome -->
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+        <style> .reveal i.fa { font-family:FontAwesome; font-style: normal; } </style>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+        
+                <!-- Title slide -->
+                <section>
+                    <small>15th OpenFOAM Workshop - June 22, 2020 - Technical Session I-D</small>
+                    <h1>A flexible and preCICE solver coupling ecosystem</h1>
+                    <div style="margin-top:50pt">
+                        <div>
+                            <small>Gerasimos Chourdakis, Technical University of Munich<br/><a href="mailto:chourdak@in.tum.de">chourdak@in.tum.de</a></small><br/>
+                            <img data-src="images/logos/tum.png" style="border:none; box-shadow:none; height:30px;">
+                        </div>
+                        <div style="margin-top:20pt">
+                            <small>Benjamin Uekermann, Eindhoven University of Technology<br/><a href="mailto:b.w.uekermann@tue.nl">b.w.uekermann@tue.nl</a></small><br/>
+                            <img data-src="images/logos/tue.png" style="border:none; box-shadow:none; height:30px;">
+                        </div>
+                    </div>
+                </section>
+                
+                <section data-markdown="sections/intro.md" data-separator-vertical="vvv"></section>
+
+                <!-- News -->
+                <section data-markdown="sections/news.md" data-separator-vertical="vvv"></section>
+                
+                <!-- The OpenFOAM adapter -->
+                <section data-markdown="sections/openfoam_pt1.md" data-separator-vertical="vvv"></section>
+                
+                <section>
+                    <!-- <h2>Running</h2> -->
+                    <script id="asciicast-134YywbxvUUV4TMWSOyH6IFEO" src="https://asciinema.org/a/134YywbxvUUV4TMWSOyH6IFEO.js" async data-autoplay="true" data-size="medium"></script>
+                    <!-- <small><a href="https://github.com/precice/precice/wiki/Tutorial-for-FSI-with-OpenFOAM-and-CalculiX">Tutorial</a> for FSI with OpenFOAM and CalculiX</small> -->
+                </section>
+                
+                <!-- The OpenFOAM adapter -->
+                <section data-markdown="sections/openfoam_pt2.md" data-separator-vertical="vvv"></section>
+                
+                <!-- A community -->
+                <section data-markdown="sections/community.md" data-separator-vertical="vvv"></section>
+                
+                <section data-background-iframe="https://www.precice.org/testimonials/"
+                  data-background-interactive>
+                </section>
+                
+                <!-- Resources -->
+                <section data-markdown="sections/resources.md" data-separator-vertical="vvv"></section>
+                
+                <!-- Closing -->
+                <section data-markdown="sections/closing.md" data-separator-vertical="vvv"></section>
+            </div>
+        </div>
+
+        <script src="dist/reveal.js"></script>
+        <script src="plugin/notes/notes.js"></script>
+        <script src="plugin/markdown/markdown.js"></script>
+        <script src="plugin/highlight/highlight.js"></script>
+        <script>
+            // More info about initialization & config:
+            // - https://revealjs.com/initialization/
+            // - https://revealjs.com/config/
+            Reveal.initialize({
+                width: 960,
+                height: 700,
+                center: true,
+                controls: true,
+                controlsTutorial: false,
+                progress: true,
+                slideNumber: false,
+                center: true,
+                hash: true,
+                transition: 'none', // none/fade/slide/convex/concave/zoom
+                backgroundTransition: 'none', // none/fade/slide/convex/concave/zoom
+                defaultTiming: 50,
+                // Learn about plugins: https://revealjs.com/plugins/
+                plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+            });
+        </script>
+    </body>
+</html>
