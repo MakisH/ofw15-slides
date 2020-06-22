@@ -4,15 +4,47 @@
 
 ## Other tutorials
 
-Show overview of tutorials (directory tree)
+```text [|1-4|10,19-20,24-25]
+tutorials
+├── CHT
+│   ├── flow-over-plate
+│   │   ├── buoyantPimpleFoam-buoyantPimpleFoam
+│   │   ├── buoyantPimpleFoam-fenics
+│   │   └── buoyantPimpleFoam-nutils
+│   └── heat_exchanger
+│       └── buoyantSimpleFoam-CalculiX
+|
+├── FSI
+│   ├── 3D_Tube
+│   │   └── OpenFOAM-CalculiX
+│   ├── cylinderFlap
+│   │   ├── OpenFOAM-CalculiX
+│   │   ├── OpenFOAM-deal.II
+│   │   └── OpenFOAM-FEniCS
+│   ├── cylinderFlap_2D
+│   │   └── OpenFOAM-deal.II
+│   ├── flap_perp
+│   │   ├── OpenFOAM-CalculiX
+│   │   ├── OpenFOAM-deal.II
+│   │   ├── OpenFOAM-FEniCS
+│   │   └── SU2-CalculiX
+│   └── flap_perp_2D
+│       └── OpenFOAM-deal.II
+|
+├── HT
+│   └── partitioned-heat
+│       └── fenics-fenics
+|
+└── SSI
+    └── loaded_beam
+        └── CalculiX-CalculiX
+```
 
 ---
 
 ## Tutorial: Channel with a perpendicular flap
 
-(image)
-
-OpenFOAM + deal.ii (2D)
+<img src="images/level3/flap_perp.png" style="max-height:400px;"/>
 
 ---
 
@@ -28,23 +60,25 @@ OpenFOAM + deal.ii (2D)
 
 ## Configuration: overview
 
-(overview picture)
+(todo: overview picture)
 
 ---
 
 ## Configuration: preciceDict
 
-(quick, more of the same)
+(todo: quick, more of the same)
 
 ---
 
 ## Configuration: OpenFOAM
 
-(quick, more of the same)
+(todo: quick, more of the same)
 
 ---
 
 ## Configuration: deal.ii
+
+(todo)
 
 - The deal.ii solver is only an example implementation
 - show the parameters file
@@ -53,7 +87,8 @@ OpenFOAM + deal.ii (2D)
 
 ## Configuration: preCICE
 
-- serial-implicit coupling
+(todo)
+
 - RBF mapping
 - parallel execution
 - watchpoint
@@ -62,11 +97,15 @@ OpenFOAM + deal.ii (2D)
 
 ## Running
 
+(todo)
+
 - Use the run scripts
 
 ---
 
 ## Results
+
+(todo)
 
 - Watchpoint
 - ParaView

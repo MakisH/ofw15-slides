@@ -1,6 +1,6 @@
 # Advertisements
 
----
+vvv
 
 ## preCICE Workshop 2021
 
@@ -14,12 +14,6 @@
 <small>preCICE Workshop 2020 @ TUM</small>
 </div>
 </div>
-
----
-
-## See also
-
-<a href="https://whova.com/portal/webapp/thope_202006/Agenda/1055667" title="Training II-E: OpenFOAM for Multiphysics Applications"><img data-src="images/closing/marschall.png" style="border:none; box-shadow:none; max-height:300px;"></a>
 
 ---
 

@@ -2,13 +2,27 @@
 
 ---
 
-## Overview
+## What does the adapter do?
 
-- Function object that calls the preCICE API
-- Writes boundary values to preCICE buffers
-- Reads boundary values from preCICE buffers
-- Adjusts the time step size
-- Stores and reloads checkpoints
+<img src="images/level2/openfoam_adapter_overview_linking.svg" />
+
+vvv
+
+## What does the adapter do?
+
+<img src="images/level2/openfoam_adapter_overview_data.svg" />
+
+vvv
+
+## What does the adapter do?
+
+<img src="images/level2/openfoam_adapter_overview_checkpointing.svg" />
+
+vvv
+
+## What does the adapter do?
+
+<img src="images/level2/openfoam_adapter_overview_timestep.svg" />
 
 ---
 
@@ -22,69 +36,81 @@
 
 ## Building
 
-- Run Allwmake
+```bash
+openfoam-adapter/ $ ./Allwmake
+
+# Debugging output in Allwmake.log, wmake.log, ldd.log
+```
+
+vvv
+
+## Building
+
+[![asciicast](https://asciinema.org/a/341978.svg)](https://asciinema.org/a/341978)
 
 ---
 
 ## Tutorial: Flow over a heated plate
 
-(image)
+![](images/level2/openfoam-openfoam_flat_plate_surface_T_RBG_ruler.png)
 
 ---
 
 ## Configuration: overview
 
-(overview picture)
+![](images/level2/config.svg)
 
----
+vvv
 
-## Configuration: preciceDict
+## Configuration: files
 
-- preciceDict example
+<pre><code class="language-bash" data-trim data-line-numbers="|13,22,26,28,34,40,44">
+.
+├── Allclean
+├── Allrun
+├── Allrun_parallel
+├── Fluid
+│   ├── 0
+│   │   ├── alphat
+│   │   ├── epsilon
+│   │   ├── k
+│   │   ├── nut
+│   │   ├── p
+│   │   ├── p_rgh
+│   │   ├── T
+│   │   └── U
+│   ├── constant
+│   │   ├── g
+│   │   ├── thermophysicalProperties
+│   │   └── turbulenceProperties
+│   ├── Fluid.foam
+│   └── system
+│       ├── blockMeshDict
+│       ├── controlDict
+│       ├── decomposeParDict
+│       ├── fvSchemes
+│       ├── fvSolution
+│       └── preciceDict
+├── overview.png
+├── precice-config.xml
+├── README.md
+├── runFluid
+├── runSolid
+└── Solid
+    ├── 0
+    │   └── T
+    ├── constant
+    │   └── transportProperties
+    ├── Solid.foam
+    └── system
+        ├── blockMeshDict
+        ├── controlDict
+        ├── decomposeParDict
+        ├── fvSchemes
+        ├── fvSolution
+        └── preciceDict
 
----
+8 directories, 35 files
+</code></pre>
 
-## Configuration: OpenFOAM
-
-- boundary condition types
-- load function object
-
----
-
-## Configuration: preCICE
-
-- serial-explicit coupling
-- nearest-projection (?) mapping
-
----
-
-## Configuration: preCICE
-
-(visualized)
-
----
-
-## Running
-
-- normal OpenFOAM execution
-- two terminals
-- look at the output
-- execute the commands one-by-one
-
----
-
-## Let's try again: Implicit Coupling
-
-- Figure
-
----
-
-## Configuration: Implicit coupling
-
-- Comparison to previous
-
----
-
-## Visualization
-
-- Show the results on ParaView
+<!-- Continuing in index.html -->
