@@ -8,7 +8,7 @@
 tutorials
 ├── CHT
 │   ├── flow-over-plate
-│   │   ├── buoyantPimpleFoam-buoyantPimpleFoam
+│   │   ├── buoyantPimpleFoam-laplacianFoam
 │   │   ├── buoyantPimpleFoam-fenics
 │   │   └── buoyantPimpleFoam-nutils
 │   └── heat_exchanger
@@ -21,15 +21,11 @@ tutorials
 │   │   ├── OpenFOAM-CalculiX
 │   │   ├── OpenFOAM-deal.II
 │   │   └── OpenFOAM-FEniCS
-│   ├── cylinderFlap_2D
-│   │   └── OpenFOAM-deal.II
 │   ├── flap_perp
 │   │   ├── OpenFOAM-CalculiX
 │   │   ├── OpenFOAM-deal.II
 │   │   ├── OpenFOAM-FEniCS
 │   │   └── SU2-CalculiX
-│   └── flap_perp_2D
-│       └── OpenFOAM-deal.II
 |
 ├── HT
 │   └── partitioned-heat
@@ -40,72 +36,24 @@ tutorials
         └── CalculiX-CalculiX
 ```
 
+<small>See <a href="https://github.com/precice/tutorials">github.com/precice/tutorials</a>.</small>
+
 ---
 
 ## Tutorial: Channel with a perpendicular flap
 
 <img src="images/level3/flap_perp.png" style="max-height:400px;"/>
 
+<small>Find the case in <a href="https://github.com/precice/tutorials/tree/master/FSI/flap_perp_2D/OpenFOAM-deal.II">github.com/precice/tutorials/FSI/flap_perp_2D/OpenFOAM-deal.II</a>.</small>
+
 ---
 
 ## Dependencies
 
-- [preCICE](https://www.precice.org/) v2
+- [preCICE](https://github.com/precice/precice/wiki/Get-preCICE) v2 (e.g. [packages for Ubuntu](https://github.com/precice/precice/releases))
+    - Build with PETSc (only for parallel && RBF)
 - Recent OpenFOAM (e.g. v1706-v1912, 4-7)
 - [preCICE OpenFOAM adapter](https://github.com/precice/openfoam-adapter) (latest master)
-- [deal.ii](https://www.dealii.org/) 9.2
-- [preCICE deal.ii adapter/example](https://github.com/precice/dealii-adapter)
+- [deal.II](https://www.dealii.org/) 9.2
+- [preCICE deal.II adapter/example](https://github.com/precice/dealii-adapter)
 
----
-
-## Configuration: overview
-
-(todo: overview picture)
-
----
-
-## Configuration: preciceDict
-
-(todo: quick, more of the same)
-
----
-
-## Configuration: OpenFOAM
-
-(todo: quick, more of the same)
-
----
-
-## Configuration: deal.ii
-
-(todo)
-
-- The deal.ii solver is only an example implementation
-- show the parameters file
-
----
-
-## Configuration: preCICE
-
-(todo)
-
-- RBF mapping
-- parallel execution
-- watchpoint
-
----
-
-## Running
-
-(todo)
-
-- Use the run scripts
-
----
-
-## Results
-
-(todo)
-
-- Watchpoint
-- ParaView

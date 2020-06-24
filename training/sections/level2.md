@@ -28,7 +28,7 @@ vvv
 
 ## Dependencies
 
-- [preCICE](https://www.precice.org/) v2
+- [preCICE](https://github.com/precice/precice/wiki/Get-preCICE) v2 (e.g. [packages for Ubuntu](https://github.com/precice/precice/releases))
 - Recent OpenFOAM (e.g. v1706-v1912 or 4-7)
 - [preCICE OpenFOAM adapter](https://github.com/precice/openfoam-adapter) (latest master)
 
@@ -46,13 +46,15 @@ vvv
 
 ## Building
 
-[![asciicast](https://asciinema.org/a/341978.svg)](https://asciinema.org/a/341978)
+<a href="https://asciinema.org/a/341978"><img src="https://asciinema.org/a/341978.svg" width="500"/></a>
 
 ---
 
 ## Tutorial: Flow over a heated plate
 
 ![](images/level2/openfoam-openfoam_flat_plate_surface_T_RBG_ruler.png)
+
+<small>Find the case in <a href="https://github.com/precice/openfoam-adapter/tree/master/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam">github.com/precice/openfoam-adapter/tutorials</a>.</small>
 
 ---
 

@@ -9,9 +9,9 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.2"
-   width="136.37999mm"
-   height="60.449997mm"
-   viewBox="0 0 13637.999 6044.9997"
+   width="137mm"
+   height="61mm"
+   viewBox="0 0 13700 6100"
    preserveAspectRatio="xMidYMid"
    xml:space="preserve"
    id="svg2"
@@ -29,21 +29,21 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="706"
-     inkscape:window-height="480"
+     inkscape:window-width="2505"
+     inkscape:window-height="1416"
      id="namedview242"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="0.3059783"
-     inkscape:cx="38.235148"
-     inkscape:cy="52.19289"
+     inkscape:zoom="0.8654373"
+     inkscape:cx="-218.06281"
+     inkscape:cy="134.22279"
      inkscape:window-x="55"
      inkscape:window-y="24"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg2" /><defs
+     inkscape:window-maximized="1"
+     inkscape:current-layer="id1" /><defs
      class="ClipPathGroup"
      id="defs4"><clipPath
        id="presentation_clip_path"
@@ -239,7 +239,7 @@
      class="TextEmbeddedBitmaps"
      id="defs104" /><g
      id="g106"
-     transform="translate(-1688,-5928)"><g
+     transform="translate(-1688,-5872.9997)"><g
        id="id2"
        class="Master_Slide"><g
          id="bg-id2"
@@ -248,13 +248,14 @@
          class="BackgroundObjects" /></g></g><g
      class="SlideGroup"
      id="g111"
-     transform="translate(-1688,-5928)"><g
+     transform="translate(-1688,-5872.9997)"><g
        id="g113"><g
          id="id1"
          class="Slide"
          clip-path="url(#presentation_clip_path)"><g
-           class="Page"
-           id="g116"><g
+           id="g4540"
+           transform="translate(139.5,0)"><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.CustomShape"
              id="g118"><g
                id="id3"><rect
@@ -273,6 +274,7 @@
                  id="path125"
                  inkscape:connector-curvature="0"
                  style="fill:none;stroke:#000000;stroke-width:51;stroke-linejoin:round" /></g></g><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.PolyPolygonShape"
              id="g127"><g
                id="id4"><rect
@@ -291,6 +293,7 @@
                  id="path134"
                  inkscape:connector-curvature="0"
                  style="fill:none;stroke:#000000;stroke-width:51;stroke-linejoin:round" /></g></g><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.TextShape"
              id="g136"><g
                id="id5"><rect
@@ -316,7 +319,8 @@
                        style="fill:#000000;stroke:none">OpenFOAM</tspan></tspan></tspan></text>
 </g></g><g
              class="com.sun.star.drawing.PolyPolygonShape"
-             id="g149"><g
+             id="g149"
+             transform="translate(30.999665,-207.0003)"><g
                id="id6"><rect
                  class="BoundingBox"
                  x="13470"
@@ -333,6 +337,7 @@
                  id="path156"
                  inkscape:connector-curvature="0"
                  style="fill:none;stroke:#000000;stroke-width:51;stroke-linejoin:round" /></g></g><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.TextShape"
              id="g158"><g
                id="id7"><rect
@@ -357,6 +362,7 @@
                        id="tspan169"
                        style="fill:#000000;stroke:none">libprecice</tspan></tspan></tspan></text>
 </g></g><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.LineShape"
              id="g171"><g
                id="id8"><rect
@@ -371,6 +377,7 @@
                  id="path176"
                  inkscape:connector-curvature="0"
                  style="fill:none;stroke:#000000;stroke-width:28;stroke-linejoin:round" /></g></g><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.TextShape"
              id="g178"><g
                id="id9"><rect
@@ -395,6 +402,7 @@
                        id="tspan189"
                        style="fill:#000000;stroke:none">adapter</tspan></tspan></tspan></text>
 </g></g><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.LineShape"
              id="g191"><g
                id="id10"><rect
@@ -409,6 +417,7 @@
                  id="path196"
                  inkscape:connector-curvature="0"
                  style="fill:none;stroke:#000000;stroke-width:28;stroke-linejoin:round" /></g></g><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.ConnectorShape"
              id="g198"><g
                id="id11"><rect
@@ -427,6 +436,7 @@
                  id="path205"
                  inkscape:connector-curvature="0"
                  style="fill:#000000;stroke:none" /></g></g><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.ConnectorShape"
              id="g207"><g
                id="id12"><rect
@@ -445,6 +455,7 @@
                  id="path214"
                  inkscape:connector-curvature="0"
                  style="fill:#000000;stroke:none" /></g></g><g
+             transform="translate(30.999665,-55.0003)"
              class="com.sun.star.drawing.TextShape"
              id="g216"><g
                id="id13"><rect
@@ -469,6 +480,7 @@
                        id="tspan227"
                        style="fill:#000000;stroke:none">adjust time step size</tspan></tspan></tspan></text>
 </g></g><g
+             transform="translate(-420.55586,-55.0003)"
              class="com.sun.star.drawing.TextShape"
              id="g229"><g
                id="id14"><rect

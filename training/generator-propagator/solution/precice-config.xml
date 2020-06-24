@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<precice-configuration>
+
+  <log>
+    <sink filter= "%Severity% > debug" format="---[precice] %ColorizedSeverity% %Message%" enabled="true" />	
+  </log>
+
+  <solver-interface dimensions="2">
+
+  <data:scalar name="Data"/>
+
+  <mesh name="Generator-Mesh">
+    <use-data name="Data"/>
+  </mesh>
+
+  <mesh name="Propagator-Mesh">
+    <use-data name="Data" />
+  </mesh>
+  
+  <participant name="Generator">
+    <use-mesh name="Generator-Mesh" provide="yes"/>
+    <write-data name="Data" mesh="Generator-Mesh"/>
+  </participant>
+
+  <participant name="Propagator">
+    <use-mesh name="Generator-Mesh" from="Generator"/>
+    <use-mesh name="Propagator-Mesh" provide="yes"/>
+    <mapping:nearest-neighbor direction="read"  from="Generator-Mesh" to="Propagator-Mesh" constraint="consistent"/>
+    <read-data name="Data" mesh="Propagator-Mesh" />
+  </participant>    
+
+  <m2n:sockets from="Generator" to="Propagator"/>
+
+  <coupling-scheme:serial-explicit>
+    <participants first="Generator" second="Propagator"/>
+    <time-window-size value="0.01"/>
+    <max-time value="0.1"/>
+    <exchange data="Data" mesh="Generator-Mesh" from="Generator" to="Propagator"/>
+  </coupling-scheme:serial-explicit>
+
+  </solver-interface>
+
+</precice-configuration>

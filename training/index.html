@@ -55,6 +55,19 @@
 
                         ---
 
+                        ## Dependencies
+
+                        - [preCICE](https://github.com/precice/precice/wiki/Get-preCICE) v2 (e.g. [packages for Ubuntu](https://github.com/precice/precice/releases))
+                        - Python 3
+                        - Python packages `numpy`, `matplotlib`
+                        - [preCICE Python bindings](https://github.com/precice/python-bindings):
+                           ```bash
+                           pip3 install --upgrade pip
+                           pip3 install --user pyprecice
+                           ```
+                        
+                        ---
+
                         ## "Generator" and "Propagator"
 
                         <div class="container" style="margin-top:50pt">
@@ -73,7 +86,7 @@
 
                         ---
 
-                        ## Serial-Explicit, Unidirectional Coupling
+                        ## Unidirectional coupling
 
                         <img data-src="images/level1/serial-explicit.svg" style="border:none; box-shadow:none; max-width:80%;">
                         
@@ -100,6 +113,8 @@
                             break
                         ```
 
+                        <small>Find these files in <a href="https://github.com/MakisH/ofw15-slides/training/generator-propagator">github.com/MakisH/ofw15-slides/training/generator-propagator</a>.</small>
+
                         vvv
 
                         ## propagator.py
@@ -116,7 +131,7 @@
                         dt = 0.01
                         t = 0
 
-                        # some data to propagate, "-1" in Python means the last entry
+                        # boundary condition for u (arbitrary)
                         u[:,-1] = y[:-1] 
 
                         while True:
@@ -134,20 +149,22 @@
                           if(t > 0.2):
                             break
                         ```
-
-                        ---
-
-                        ## Dependencies
-
-                        - [preCICE](https://www.precice.org/) v2
-                        - Python 3
-                        - Python packages `numpy`, `matplotlib`
-                        - [preCICE Python bindings](https://github.com/precice/python-bindings)
                     </textarea>
+                </section>
+                
+                <section>
+                    <section>
+                        <script id="asciicast-342201" src="https://asciinema.org/a/342201.js" async data-autoplay="true" data-size="medium" preload="1"></script>
+                    </section>
+                    <section>
+                        <h2>Uncoupled simulation</h2>
+                        <p><video data-autoplay src="videos/propagator_constant.webm"></video></p>
+                    </section>
                 </section>
                 
                 <!--- Level 1: Code step-by-step -->
                 <!-- Base -->
+                <section>
                 <section data-auto-animate>
                     <h2>Import preCICE</h2>
                     <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers>
@@ -229,10 +246,10 @@
                             break
                     </code></pre>
                 </section>
-                <!-- Set the preCICE mesh vertices -->
+                <!-- Define the coupling mesh -->
                 <section data-auto-animate>
-                    <h2>Set the preCICE mesh vertices</h2>
-                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="8-19|21-25">
+                    <h2>Define the coupling mesh</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="8-19|21-27">
                         import numpy
                         import precice
                         
@@ -257,7 +274,7 @@
                         mesh_name  = "Generator-Mesh"
                         mesh_id    = interface.get_mesh_id(mesh_name)
                         
-                        # preCICE mesh setup
+                        # Define the coupling mesh
                         vertices   = [[1, y0] for y0 in y[:-1]]
                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
                         
@@ -301,7 +318,7 @@
                         mesh_name  = "Generator-Mesh"
                         mesh_id    = interface.get_mesh_id(mesh_name)
                         
-                        # preCICE mesh setup
+                        # Define the coupling mesh
                         vertices   = [[1, y0] for y0 in y[:-1]]
                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
                         
@@ -349,7 +366,7 @@
                         mesh_name  = "Generator-Mesh"
                         mesh_id    = interface.get_mesh_id(mesh_name)
                          
-                        # preCICE mesh setup
+                        # Define the coupling mesh
                         vertices   = [[1, y0] for y0 in y[:-1]]
                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
                         
@@ -399,7 +416,7 @@
                          mesh_name  = "Generator-Mesh"
                          mesh_id    = interface.get_mesh_id(mesh_name)
                          
-                         # preCICE mesh setup
+                         # Define the coupling mesh
                          vertices   = [[1, y0] for y0 in y[:-1]]
                          vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
                         
@@ -417,6 +434,56 @@
                           t = t + dt 
                           if(t > 0.1):
                             break
+                        
+                        interface.finalize()
+                    </code></pre>
+                </section>
+                <!-- Advance the coupling: end -->
+                <section data-auto-animate>
+                    <h2>Advance the coupling</h2>
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="34-42">
+                        import numpy
+                        import precice
+                        
+                        # generate mesh
+                        n = 20
+                        y = numpy.linspace(0, 1, n + 1)
+
+                        # preCICE setup
+                        participant_name     = "Generator"
+                        config_file_name     = "precice-config.xml"
+                        solver_process_index = 0
+                        solver_process_size  = 1
+                        interface = 
+                            precice.Interface(  
+                                               participant_name,
+                                               config_file_name,
+                                               solver_process_index,
+                                               solver_process_size
+                                             )
+                        
+                        # Get the preCICE mesh id
+                        mesh_name  = "Generator-Mesh"
+                        mesh_id    = interface.get_mesh_id(mesh_name)
+                        
+                        # Define the coupling mesh
+                        vertices   = [[1, y0] for y0 in y[:-1]]
+                        vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+                        
+                        interface.initialize()
+
+                        dt = 0.01
+                        t = 0
+
+                        while interface.is_coupling_ongoing():
+                          print("Generating data")
+                          u = 1 - 2 * numpy.random.rand(n)
+                          
+                          interface.advance(dt)
+                          
+                          t = t + dt 
+                        
+                        
                         
                         interface.finalize()
                     </code></pre>
@@ -449,7 +516,7 @@
                         mesh_name  = "Generator-Mesh"
                         mesh_id    = interface.get_mesh_id(mesh_name)
                         
-                        # preCICE mesh setup
+                        # Define the coupling mesh
                         vertices   = [[1, y0] for y0 in y[:-1]]
                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
                         
@@ -499,7 +566,7 @@
                         mesh_name  = "Generator-Mesh"
                         mesh_id    = interface.get_mesh_id(mesh_name)
                         
-                        # preCICE mesh setup
+                        # Define the coupling mesh
                         vertices   = [[1, y0] for y0 in y[:-1]]
                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
                         
@@ -521,18 +588,22 @@
                         interface.finalize()
                     </code></pre>
                 </section>
+                </section>
                 <!-- Run and results -->
+                <section>
                 <section>Not there yet, but let's run it<br/><small>(similar changes in <tt>propagator.py</tt> - try it at home)</small></section>
-                <section><script id="asciicast-UwMVk0tbq8cOCdTd5dEpNh7F3" src="https://asciinema.org/a/UwMVk0tbq8cOCdTd5dEpNh7F3.js" data-autoplay="true" data-size="medium"></script></section>
+                <section><script id="asciicast-UwMVk0tbq8cOCdTd5dEpNh7F3" src="https://asciinema.org/a/UwMVk0tbq8cOCdTd5dEpNh7F3.js" data-autoplay="true" data-size="medium" preload="1"></script></section>
                 <section>
                     <h2>Nothing happening?</h2>
                     <p><video data-autoplay src="videos/propagator_constant.webm"></video></p>
                     <small>Did we forget something?</small>
                 </section>
+                </section>
+                <section>
                 <!-- Write & read data: focus -->
                 <section data-auto-animate>
                     <h2>Write & read data</h2>
-                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="38,45">
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="25-31">
                         import numpy
                         import precice
                         
@@ -557,7 +628,7 @@
                         mesh_name  = "Generator-Mesh"
                         mesh_id    = interface.get_mesh_id(mesh_name)
                          
-                        # preCICE mesh setup
+                        # Define the coupling mesh
                         vertices   = [[1, y0] for y0 in y[:-1]]
                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
                         
@@ -588,7 +659,7 @@
                 <!-- Write & read data: implement -->
                 <section data-auto-animate>
                     <h2>Write & read data</h2>
-                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="38, 45|44,46|29-31|29-31,44">
+                    <pre data-id="code-animation"><code class="language-python" data-trim data-line-numbers="25-31|44-46">
                         import numpy
                         import precice
                         
@@ -613,7 +684,7 @@
                         mesh_name  = "Generator-Mesh"
                         mesh_id    = interface.get_mesh_id(mesh_name)
                          
-                        # preCICE mesh setup
+                        # Define the coupling mesh
                         vertices   = [[1, y0] for y0 in y[:-1]]
                         vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
                         
@@ -641,6 +712,24 @@
                         interface.finalize()
                     </code></pre>
                 </section>
+                </section>
+                
+                <!-- Run and results, part 2 -->
+                <section>
+                <section>It should work now!</small></section>
+                <section><script id="asciicast-IwmCtbNoGxqgsrNEiA7mONPmv" src="https://asciinema.org/a/IwmCtbNoGxqgsrNEiA7mONPmv.js" async data-autoplay="true" data-size="medium" preload="1"></script></section>
+                <section>
+                    <h2>Data is being transfered!</h2>
+                    <p><video data-autoplay src="videos/propagator_coupled.webm"></video></p>
+                    <small>Most basic case: uni-directional, serial-explicit, nearest-neighbor mapping, ...</small>
+                </section>
+                </section>
+                
+                <section>
+                    <h2>Side note: Subcycling</h2>
+                    <img src="images/level1/subcycling.svg" />
+                </section>
+                
                 <!-- preCICE config -->
                 <section>
                     <h2>preCICE configuration file</h2>
@@ -650,58 +739,91 @@
                     </section>
                     <section>
                     <small><tt>precice-config.xml</tt>:</small>
-                    <pre><code class="language-xml" data-trim data-line-numbers="3|5|7-13|15-18|20-25|27|29-34">
-                        <script type="text/template">
-                        <precice-configuration>
-                          <solver-interface dimensions="2">
+                    <pre><code class="language-xml" data-trim data-line-numbers="2|4|6-12|14-17|19-26|19,22-24,26|28|30-36">
+                        &lt;precice-configuration&gt;
+                          &lt;solver-interface dimensions="2"&gt;
 
-                          <data:scalar name="Data"/>
+                          &lt;data:scalar name="Data"/&gt;
 
-                          <mesh name="Generator-Mesh">
-                            <use-data name="Data"/>
-                          </mesh>
+                          &lt;mesh name="Generator-Mesh"&gt;
+                            &lt;use-data name="Data"/&gt;
+                          &lt;/mesh&gt;
 
-                          <mesh name="Propagator-Mesh">
-                            <use-data name="Data" />
-                          </mesh>
+                          &lt;mesh name="Propagator-Mesh"&gt;
+                            &lt;use-data name="Data" /&gt;
+                          &lt;/mesh&gt;
                           
-                          <participant name="Generator">
-                            <use-mesh name="Generator-Mesh" provide="yes"/>
-                            <write-data name="Data" mesh="Generator-Mesh"/>
-                          </participant>
+                          &lt;participant name="Generator"&gt;
+                            &lt;use-mesh name="Generator-Mesh" provide="yes"/&gt;
+                            &lt;write-data name="Data" mesh="Generator-Mesh"/&gt;
+                          &lt;/participant&gt;
 
-                          <participant name="Propagator">
-                            <use-mesh name="Generator-Mesh" from="Generator"/>
-                            <use-mesh name="Propagator-Mesh" provide="yes"/>
-                            <mapping:nearest-neighbor direction="read"  from="Generator-Mesh" to="Propagator-Mesh" constraint="consistent"/>
-                            <read-data name="Data" mesh="Propagator-Mesh" />
-                          </participant>    
+                          &lt;participant name="Propagator"&gt;
+                            &lt;use-mesh name="Generator-Mesh" from="Generator"/&gt;
+                            &lt;use-mesh name="Propagator-Mesh" provide="yes"/&gt;
+                            &lt;mapping:nearest-neighbor direction="read"
+                              from="Generator-Mesh" to="Propagator-Mesh"
+                              constraint="consistent"/&gt;
+                            &lt;read-data name="Data" mesh="Propagator-Mesh" /&gt;
+                          &lt;/participant&gt;    
 
-                          <m2n:sockets from="Generator" to="Propagator"/>
+                          &lt;m2n:sockets from="Generator" to="Propagator"/&gt;
 
-                          <coupling-scheme:serial-explicit>
-                            <participants first="Generator" second="Propagator"/>
-                            <time-window-size value="0.01"/>
-                            <max-time value="0.1"/>
-                            <exchange data="Data" mesh="Generator-Mesh" from="Generator" to="Propagator"/>
-                          </coupling-scheme:serial-explicit>
+                          &lt;coupling-scheme:serial-explicit&gt;
+                            &lt;participants first="Generator" second="Propagator"/&gt;
+                            &lt;time-window-size value="0.01"/&gt;
+                            &lt;max-time value="0.1"/&gt;
+                            &lt;exchange data="Data" mesh="Generator-Mesh"
+                              from="Generator" to="Propagator"/&gt;
+                          &lt;/coupling-scheme:serial-explicit&gt;
                           
-                          </solver-interface>
-                        </precice-configuration>
-                    </script></code></pre>
+                          &lt;/solver-interface&gt;
+                        &lt;/precice-configuration&gt;
+                    </code></pre>
                 </section>
-                </section>
-                <!-- Run and results, part 2 -->
-                <section>It should work now!</small></section>
-                <section><script id="asciicast-IwmCtbNoGxqgsrNEiA7mONPmv" src="https://asciinema.org/a/IwmCtbNoGxqgsrNEiA7mONPmv.js" async data-autoplay="true" data-size="medium"></script></section>
-                <section>
-                    <h2>Data is being transfered!</h2>
-                    <p><video data-autoplay src="videos/propagator_coupled.webm"></video></p>
-                    <small>Most basic case: uni-directional, serial-explicit, nearest-neighbor mapping, ...</small>
                 </section>
                 
                 <!-- Level 2: OpenFOAM + OpenFOAM -->
                 <section data-markdown="sections/level2.md" data-separator-vertical="vvv"></section>
+                
+                <section>
+                    <h2>Enabling the adapter</h2>
+                    <div class="container">
+                    <div class="col">
+                    <pre><code class="language-cpp" data-trim data-line-numbers="">
+                        // Fluid/system/controlDict
+                        
+                        functions
+                        {
+                        preCICE_Adapter
+                        {
+                            
+                        type preciceAdapterFunctionObject;
+                        libs ("libpreciceAdapterFunctionObject.so");
+                        
+                        }
+                        }
+                    </code></pre>
+                    </div>
+                    <div class="col">
+                    <pre><code class="language-cpp" data-trim data-line-numbers="">
+                        // Solid/system/controlDict
+                        
+                        functions
+                        {
+                        preCICE_Adapter
+                        {
+                            
+                        type preciceAdapterFunctionObject;
+                        libs ("libpreciceAdapterFunctionObject.so");
+                        
+                        }
+                        }
+                    </code></pre>
+                    </div>
+                    </div>
+                    
+                </section>
                 
                 <section>
                 <h2>OpenFOAM adapter config</h2>
@@ -776,6 +898,50 @@
                 </section>
                 
                 <section>
+                <h2>The interface patch</h2>
+                <div class="container">
+                <div class="col">
+                <pre><code class="language-cpp" data-trim data-line-numbers="">
+                // Fluid/system/blockMeshDict
+                
+                boundary
+                (
+                    interface
+                    {
+                        type wall;
+                        faces
+                        (
+                            (4 0 1 5)
+                        );
+                    }
+
+                    // ...
+                );
+                </code></pre>
+                </div>
+                <div class="col">
+                <pre><code class="language-cpp" data-trim data-line-numbers="">
+                // Solid/system/blockMeshDict
+                
+                boundary
+                (
+                    interface
+                    {
+                        type wall;
+                        faces
+                        (
+                            (7 6 2 3)
+                        );
+                    }
+                    
+                    // ...
+                );
+                </code></pre>
+                </div>
+                </div>
+                </section>
+                
+                <section>
                 <h2>OpenFOAM boundary conditions</h2>
                 <div class="container">
                 <div class="col">
@@ -829,87 +995,72 @@
                 </section>
                 
                 <section>
-                    <h2>Enabling the adapter</h2>
-                    <pre><code class="language-cpp" data-trim data-line-numbers="">
-                        functions
-                        {
-                            preCICE_Adapter
-                            {
-                                type preciceAdapterFunctionObject;
-                                libs ("libpreciceAdapterFunctionObject.so");
-                            }
-                        }
-                    </code></pre>
-                </section>
-                
-                <section>
                 <section>
                     <h2>precice-config.xml</h2>
-                    <pre><code class="language-xml" data-trim data-line-numbers="6-8|10|12-13|15-23|25-31|28-29|30|26-27,30|33-39|41|43-59|43,59,44-45|43,59,46|43,59,47-51|43,59,52-58">
-                        <script type="text/template">
-                        <?xml version="1.0"?>
+                    <pre><code class="language-xml" data-trim data-line-numbers="3|5-6|8-16|18-26|18,26,21-22|18,26,23-25|18,26,23-25,19-20|28-36|40-58|40,58,41-42|40,58,43|40,58,44-47|48-50|51-57">
+                        &lt;precice-configuration&gt;
 
-                        <precice-configuration>
+                            &lt;solver-interface dimensions="3"&gt;
 
-                            <log>
-                                <sink filter="%Severity% > debug and %Rank% = 0" format="---[precice] %ColorizedSeverity% %Message%" enabled="true"/>
-                            </log>
+                            &lt;data:scalar name="Temperature"/&gt;
+                            &lt;data:scalar name="Heat-Flux"/&gt;
 
-                            <solver-interface dimensions="3">
+                            &lt;mesh name="Fluid-Mesh"&gt;
+                                &lt;use-data name="Temperature"/&gt;
+                                &lt;use-data name="Heat-Flux"/&gt;
+                            &lt;/mesh&gt;
 
-                            <data:scalar name="Temperature"/>
-                            <data:scalar name="Heat-Flux"/>
+                            &lt;mesh name="Solid-Mesh"&gt;
+                                &lt;use-data name="Temperature"/&gt;
+                                &lt;use-data name="Heat-Flux"/&gt;
+                            &lt;/mesh&gt;
 
-                            <mesh name="Fluid-Mesh">
-                                <use-data name="Temperature"/>
-                                <use-data name="Heat-Flux"/>
-                            </mesh>
+                            &lt;participant name="Fluid"&gt;
+                                &lt;use-mesh name="Fluid-Mesh" provide="yes"/&gt;
+                                &lt;use-mesh name="Solid-Mesh" from="Solid"/&gt;
+                                &lt;read-data name="Heat-Flux" mesh="Fluid-Mesh"/&gt;
+                                &lt;write-data name="Temperature" mesh="Fluid-Mesh"/&gt;
+                                &lt;mapping:nearest-neighbor direction="read"
+                                  from="Solid-Mesh" to="Fluid-Mesh"
+                                  constraint="consistent"/&gt;
+                            &lt;/participant&gt;
 
-                            <mesh name="Solid-Mesh">
-                                <use-data name="Temperature"/>
-                                <use-data name="Heat-Flux"/>
-                            </mesh>
+                            &lt;participant name="Solid"&gt;
+                                &lt;use-mesh name="Fluid-Mesh" from="Fluid"/&gt;
+                                &lt;use-mesh name="Solid-Mesh" provide="yes"/&gt;
+                                &lt;read-data name="Temperature" mesh="Solid-Mesh"/&gt;
+                                &lt;write-data name="Heat-Flux" mesh="Solid-Mesh"/&gt;
+                                &lt;mapping:nearest-neighbor direction="read"
+                                  from="Fluid-Mesh" to="Solid-Mesh"
+                                  constraint="consistent"/&gt;
+                            &lt;/participant&gt;
 
-                            <participant name="Fluid">
-                                <use-mesh name="Fluid-Mesh" provide="yes"/>
-                                <use-mesh name="Solid-Mesh" from="Solid"/>
-                                <read-data name="Heat-Flux" mesh="Fluid-Mesh"/>
-                                <write-data name="Temperature" mesh="Fluid-Mesh"/>
-                                <mapping:nearest-neighbor direction="read" from="Solid-Mesh" to="Fluid-Mesh" constraint="consistent" timing="initial"/>
-                            </participant>
+                            &lt;m2n:sockets from="Fluid" to="Solid"/&gt;
 
-                            <participant name="Solid">
-                                <use-mesh name="Fluid-Mesh" from="Fluid"/>
-                                <use-mesh name="Solid-Mesh" provide="yes"/>
-                                <read-data name="Temperature" mesh="Solid-Mesh"/>
-                                <write-data name="Heat-Flux" mesh="Solid-Mesh"/>
-                                <mapping:nearest-neighbor direction="read" from="Fluid-Mesh" to="Solid-Mesh" constraint="consistent" timing="initial"/>
-                            </participant>
+                            &lt;coupling-scheme:serial-implicit&gt;
+                                &lt;time-window-size value="0.01"/&gt;
+                                &lt;max-time value="1"/&gt;
+                                &lt;participants first="Fluid" second="Solid"/&gt;
+                                &lt;exchange data="Temperature" mesh="Fluid-Mesh"
+                                  from="Fluid" to="Solid"/&gt;
+                                &lt;exchange data="Heat-Flux" mesh="Solid-Mesh"
+                                  from="Solid" to="Fluid"/&gt;
+                                &lt;max-iterations value="200"/&gt;
+                                &lt;relative-convergence-measure limit="1.0e-6"
+                                  data="Temperature" mesh="Fluid-Mesh"/&gt;
+                                &lt;acceleration:IQN-ILS&gt;
+                                    &lt;data mesh="Solid-Mesh" name="Heat-Flux" /&gt;
+                                    &lt;initial-relaxation value="0.01" /&gt;
+                                    &lt;max-used-iterations value="80" /&gt;
+                                    &lt;time-windows-reused value="10" /&gt;
+                                    &lt;filter type="QR1" limit="1e-8" /&gt;
+                                &lt;/acceleration:IQN-ILS&gt;
+                            &lt;/coupling-scheme:serial-implicit&gt;
 
-                            <m2n:sockets from="Fluid" to="Solid"/>
+                            &lt;/solver-interface&gt;
 
-                            <coupling-scheme:serial-implicit>
-                                <time-window-size value="0.01"/>
-                                <max-time value="1"/>
-                                <participants first="Fluid" second="Solid"/>
-                                <exchange data="Temperature" mesh="Fluid-Mesh" from="Fluid" to="Solid"/>
-                                <exchange data="Heat-Flux" mesh="Solid-Mesh" from="Solid" to="Fluid"/>
-                                <max-iterations value="200"/>
-                                <relative-convergence-measure limit="1.0e-6" data="Temperature" mesh="Fluid-Mesh"/>
-                                <extrapolation-order value="2"/>
-                                <acceleration:IQN-ILS>
-                                    <data mesh="Solid-Mesh" name="Heat-Flux" />
-                                    <initial-relaxation value="0.01" />
-                                    <max-used-iterations value="80" />
-                                    <time-windows-reused value="10" />
-                                    <filter type="QR1" limit="1e-8" />
-                                </acceleration:IQN-ILS>
-                            </coupling-scheme:serial-implicit>
-
-                            </solver-interface>
-
-                        </precice-configuration>
-                    </script></code></pre>
+                        &lt;/precice-configuration&gt;
+                    </code></pre>
                 </section>
                 
                 <section>
@@ -920,15 +1071,252 @@
                 </section>
                 
                 <section>
-                    <script id="asciicast-341985" src="https://asciinema.org/a/341985.js" async data-autoplay="true" data-size="medium"></script>
+                    <script id="asciicast-341985" src="https://asciinema.org/a/341985.js" async data-autoplay="true" data-size="medium" preload="1"></script>
                 </section>
                 
                 <section>
                     <p><video data-autoplay src="videos/heated_plate_paraview.webm"></video></p>
+                    <small>"Flickering"? <a href="https://github.com/precice/openfoam-adapter/issues/26">Run <tt>./removeObsoleteFolders.sh</tt></a> first.</small>
                 </section>
                 
-                <!-- Level 3: OpenFOAM + deal.ii -->
+                <!-- Level 3: OpenFOAM + deal.II -->
                 <section data-markdown="sections/level3.md" data-separator-vertical="vvv"></section>
+                
+                <section>
+                <h2>Configure OpenFOAM</h2>
+                <pre><code class="language-cpp" data-trim data-line-numbers="">
+                // Fluid/0.orig/U
+                    
+                flap
+                {
+                    type            movingWallVelocity;
+                    value           uniform (0 0 0);
+                }
+                </code></pre>
+                <pre><code class="language-cpp" data-trim data-line-numbers="">
+                // Fluid/0.orig/pointDisplacement
+                    
+                flap
+                {
+                    type            fixedValue;
+                    value           $internalField;
+                }
+                </code></pre>
+                <pre><code class="language-cpp" data-trim data-line-numbers="">
+                // Fluid/constant/dynamicMeshDict
+                    
+                solver      displacementLaplacian;
+                </code></pre>
+                </section>
+                
+                <section>
+                <h2>Configure the OpenFOAM adapter</h2>
+                <pre><code class="language-cpp" data-trim data-line-numbers="">
+                // Fluid/system/preciceDict
+                    
+                preciceConfig "precice-config.xml";
+
+                participant Fluid;
+
+                modules (FSI);
+
+                interfaces
+                {
+                  Interface1
+                  {
+                    mesh              Fluid-Mesh-Centers;
+                    patches           (flap);
+                    locations         faceCenters;
+                    
+                    readData
+                    (
+                    );
+                    
+                    writeData
+                    (
+                      Stress
+                    );
+                  };
+                  
+                  Interface2
+                  {
+                    mesh              Fluid-Mesh-Nodes;
+                    patches           (flap);
+                    locations         faceNodes;
+                    
+                    readData
+                    (
+                      Displacement
+                    );
+                    
+                    writeData
+                    (
+                    );
+                  };
+                };
+
+                FSI
+                {
+                  rho rho [1 -3 0 0 0 0 0] 1;
+                }
+                </code></pre>
+                </section>
+                
+                <section>
+                <h2>Configure the deal.ii adapter</h2>
+                <div class="col">
+                <pre><code class="language-text" data-trim data-line-numbers="">
+                // Solid/linear_elasticity.prm
+                    
+                subsection precice configuration
+                  # Cases: FSI3 or PF for perpendicular flap
+                  set Scenario            = PF
+
+                  # Name of the precice configuration file
+                  set precice config-file = precice-config.xml
+
+                  # Name of the participant in the precice-config.xml file
+                  set Participant name    = Solid
+
+                  # Name of the coupling mesh in the precice-config.xml file
+                  set Mesh name           = Solid_mesh
+
+                  # Name of the read data in the precice-config.xml file
+                  set Read data name      = Stress
+
+                  # Name of the write data in the precice-config.xml file
+                  set Write data name     = Displacement
+                end
+                </code></pre>
+                </div>
+                </section>
+                
+                <section>
+                <h2>Configure preCICE</h2>
+                <div class="col">
+                <pre><code class="language-xml" data-trim data-line-numbers="19-30|19,30,27-29|32,46,40-42|32,46,44-45|65-72">
+                    &lt;precice-configuration&gt;
+                        &lt;solver-interface dimensions="2"&gt;
+
+                        &lt;data:vector name="Stress"/&gt;
+                        &lt;data:vector name="Displacement"/&gt;
+
+                        &lt;mesh name="Fluid-Mesh-Centers"&gt;
+                            &lt;use-data name="Stress"/&gt;
+                       &lt;/mesh&gt;
+                        &lt;mesh name="Fluid-Mesh-Nodes"&gt;
+                            &lt;use-data name="Displacement"/&gt;
+                        &lt;/mesh&gt;
+
+                        &lt;mesh name="Solid_mesh"&gt;
+                            &lt;use-data name="Displacement"/&gt;
+                            &lt;use-data name="Stress"/&gt;
+                        &lt;/mesh&gt;
+
+                        &lt;participant name="Fluid"&gt;
+                            &lt;use-mesh name="Fluid-Mesh-Nodes" provide="yes"/&gt;
+                            &lt;use-mesh name="Fluid-Mesh-Centers" provide="yes"/&gt;
+                            &lt;use-mesh name="Solid_mesh" from="Solid"/&gt;
+                            
+                            &lt;read-data name="Displacement" mesh="Fluid-Mesh-Nodes"/&gt;
+                            &lt;write-data name="Stress" mesh="Fluid-Mesh-Centers"/&gt;
+                            
+                            &lt;mapping:rbf-thin-plate-splines direction="read"
+                                from="Solid_mesh" to="Fluid-Mesh-Nodes"
+                                constraint="consistent"/&gt;
+                        &lt;/participant&gt;
+
+                        &lt;participant name="Solid"&gt;
+                            &lt;use-mesh name="Solid_mesh" provide="yes"/&gt;
+                            &lt;use-mesh name="Fluid-Mesh-Centers" from="Fluid"/&gt;
+                            &lt;use-mesh name="Fluid-Mesh-Nodes" from="Fluid"/&gt;
+                            
+                            &lt;read-data name="Stress"  mesh="Solid_mesh"/&gt;
+                            &lt;write-data name="Displacement" mesh="Solid_mesh"/&gt;
+                            
+                            &lt;mapping:rbf-thin-plate-splines direction="read"
+                                from="Fluid-Mesh-Centers" to="Solid_mesh"
+                                constraint="consistent" /&gt;
+                                
+                            &lt;watch-point mesh="Solid_mesh" name="flap_tip"
+                                coordinate="-0.05;1;0" /&gt;
+                        &lt;/participant&gt;
+
+                        &lt;m2n:sockets from="Fluid" to="Solid" /&gt;
+
+                        &lt;coupling-scheme:serial-implicit&gt;
+                            &lt;time-window-size value="0.01"/&gt;
+                            &lt;max-time value="5"/&gt;
+                            &lt;participants first="Fluid" second="Solid"/&gt;
+                            &lt;exchange data="Stress" mesh="Fluid-Mesh-Centers"
+                                from="Fluid" to="Solid"/&gt;
+                            &lt;exchange data="Displacement" mesh="Solid_mesh"
+                                from="Solid" to="Fluid" initialize="0"/&gt;
+
+                            &lt;max-iterations value="50"/&gt;
+                            &lt;relative-convergence-measure limit="1e-4"
+                                data="Stress" mesh="Fluid-Mesh-Centers"/&gt;
+                            &lt;relative-convergence-measure limit="1e-4"
+                                data="Displacement" mesh="Solid_mesh"/&gt;
+
+                            &lt;acceleration:IQN-ILS&gt;
+                                &lt;data name="Displacement" mesh="Solid_mesh"/&gt;
+                                &lt;preconditioner type="residual-sum"/&gt;
+                                &lt;filter type="QR1" limit="1e-6"/&gt;
+                                &lt;initial-relaxation value="0.1"/&gt;
+                                &lt;max-used-iterations value="50"/&gt;
+                                &lt;time-windows-reused value="10"/&gt;
+                            &lt;/acceleration:IQN-ILS&gt;
+
+                        &lt;/coupling-scheme:serial-implicit&gt;
+                        &lt;/solver-interface&gt;
+                    &lt;/precice-configuration&gt;
+                </code></pre>
+                </div>
+                </section>
+                
+                <section>
+                <section>
+                    <script id="asciicast-342273" src="https://asciinema.org/a/342273.js" async data-autoplay="true" data-size="medium" preload="1"></script>
+                </section>
+                
+                <section>
+                    <p><video data-autoplay src="videos/openfoam_dealii_paraview.webm" style="width:600px;"></video></p>
+                    <small>Linear solid model</small>
+                </section>
+           
+                <section>
+                    <h2>How is the tip moving?</h2>
+                    <div class="container">
+                        <div class="col">
+                            <pre><code class="language-bash" data-trim data-line-numbers="">
+                                #! /bin/bash
+                                gnuplot -p << EOF
+                                set grid
+                                set title 'Displacement of the Flap Tip'
+                                set xlabel 'Time [s]'
+                                set ylabel 'X-Displacement [m]'
+                                set linestyle  1 lt 2 lc 1 # red-dashed
+                                plot "precice-Solid-watchpoint-flap_tip.log"
+                                    using 1:4 
+                                    title 'Top displacemement'
+                                    with lines
+                                EOF
+                            </code></pre>
+                        </div>
+                        <div class="col">
+                            <img src="images/level3/watchpoint.svg"/>
+                        </div>
+                    </div>
+                </section>
+                </section>
+                
+                <!-- CalculiX -->
+                <section>
+                    <h2>See also: OpenFOAM + CalculiX</h2>
+                    
+                    <a href="https://asciinema.org/a/341806" target="_blank"><img src="https://asciinema.org/a/341806.svg" style="width:600px"/></a>
+                </section>
                 
                 <!-- Resources -->
                 <section data-markdown="sections/resources.md" data-separator-vertical="vvv"></section>
