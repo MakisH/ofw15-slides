@@ -6,7 +6,7 @@
 - Event: [15th OpenFOAM Workshop](http://www.cpe.vt.edu/ofw15/), Arlington, VA, USA (switched to online)
 - Date: June 22, 2020
 
-Find also the slides of my training talk "Multiphysics Modeling with the preCICE Coupling Library" in the [parent directory](..).
+Find also the slides of my training talk "Multiphysics Modeling with the preCICE Coupling Library" in the [parent directory / on GitHub](https://github.com/MakisH/ofw15-slides).
 
 ## Abstract
 
