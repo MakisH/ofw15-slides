@@ -13,6 +13,14 @@
 
 ---
 
+# preCICE is free because of
+
+<img src="images/closing/funding.png" style="height:400px;"/>
+
+<small>and the code/issues/testing/documentation contributions of people like you (thank you!).</small>
+
+---
+
 # Summary
 
 <div style="color:#0065BD; margin-top:50pt; margin-bottom:30pt;">
