@@ -36,7 +36,7 @@ See section "[Export to PDF](https://revealjs.com/pdf-export/)" in the reveal.js
 [Decktape](https://github.com/astefanutti/decktape) does a marvelous job converting this presentation to PDF. Get the Docker image (see Decktape README) and run (for localhost):
 
 ```bash
-docker run --rm -t --net=host -v `pwd`:/slides astefanutti/decktape -s 1024x768 http://localhost:8000 slides.pdf
+docker run --rm -t --net=host -v "$(pwd)":/slides astefanutti/decktape generic --key=" " -p 2000 -s 1920x1440 http://localhost:8000 slides.pdf
 ```
 
 ## License & more
