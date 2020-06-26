@@ -6,7 +6,7 @@
 - Event: [15th OpenFOAM Workshop](http://www.cpe.vt.edu/ofw15/), Arlington, VA, USA (switched to online)
 - Date: June 24, 2020
 
-[Start the presentation](https://makish.github.io/ofw15-slides/) - [Get the PDF](./pdf-export/slides-training.pdf)
+[Start the presentation](https://makish.github.io/ofw15-slides/) - [Get the PDF](https://github.com/MakisH/ofw15-slides/blob/master/pdf-export/slides_training.pdf)
 
 Find also the slides of my overview talk "A flexible and preCICE solver coupling ecosystem" under [`overview-talk-slides/`](./overview-talk-slides).
 
